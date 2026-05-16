@@ -17,7 +17,7 @@
 bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/main/install.sh)
 ```
 
-安装过程中脚本会询问 ddns-go Web 管理界面端口，例如：
+安装过程中脚本会询问 ddns-go Web 管理界面端口，直接回车默认使用 `9876`，例如：
 
 ```bash
 Enter ddns-go web port, for example 50897: 50897
@@ -27,6 +27,12 @@ Enter ddns-go web port, for example 50897: 50897
 
 ```bash
 ./ddns-go -s install -l :50897
+```
+
+如果想一条命令指定端口，可以使用：
+
+```bash
+DDNS_GO_PORT=50897 bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/main/install.sh)
 ```
 
 ## 脚本会自动完成

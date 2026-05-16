@@ -4,6 +4,7 @@ set -euo pipefail
 DDNS_GO_REPO="${DDNS_GO_REPO:-jeessy2/ddns-go}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/ddns-go}"
 SERVICE_NAME="${SERVICE_NAME:-ddns-go}"
+DEFAULT_PORT="${DDNS_GO_PORT:-9876}"
 LATEST_URL="https://github.com/${DDNS_GO_REPO}/releases/latest"
 TMP_DIR="$(mktemp -d)"
 
@@ -80,7 +81,8 @@ if ! curl -fIL --retry 3 --connect-timeout 15 -o /dev/null "${ASSET_URL}"; then
   exit 1
 fi
 
-read -r -p "Enter ddns-go web port, for example 50897: " WEB_PORT
+read -r -p "Enter ddns-go web port [${DEFAULT_PORT}]: " WEB_PORT
+WEB_PORT="${WEB_PORT:-${DEFAULT_PORT}}"
 WEB_PORT="${WEB_PORT#:}"
 if ! printf '%s' "${WEB_PORT}" | grep -Eq '^[0-9]{1,5}$' || [ "${WEB_PORT}" -lt 1 ] || [ "${WEB_PORT}" -gt 65535 ]; then
   echo "Invalid port: ${WEB_PORT}" >&2
