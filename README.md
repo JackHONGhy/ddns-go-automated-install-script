@@ -14,7 +14,7 @@
 在目标服务器上使用 root 用户运行：
 
 ```bash
-bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/master/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/main/install.sh)
 ```
 
 安装过程中脚本会询问 ddns-go Web 管理界面端口，例如：
@@ -74,7 +74,7 @@ systemctl stop ddns-go
 默认安装到 `/opt/ddns-go`。如需修改：
 
 ```bash
-INSTALL_DIR=/etc/ddns-go bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/master/install.sh)
+INSTALL_DIR=/etc/ddns-go bash <(curl -Ls https://raw.githubusercontent.com/JackHONGhy/ddns-go-automated-install-script/main/install.sh)
 ```
 
 ## 文件说明
