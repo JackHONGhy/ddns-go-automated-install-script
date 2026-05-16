@@ -4,7 +4,7 @@ set -euo pipefail
 DDNS_GO_REPO="${DDNS_GO_REPO:-jeessy2/ddns-go}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/ddns-go}"
 SERVICE_NAME="${SERVICE_NAME:-ddns-go}"
-API_URL="https://api.github.com/repos/${DDNS_GO_REPO}/releases/latest"
+LATEST_URL="https://github.com/${DDNS_GO_REPO}/releases/latest"
 TMP_DIR="$(mktemp -d)"
 
 cleanup() {
@@ -48,7 +48,6 @@ need_cmd curl
 need_cmd tar
 need_cmd systemctl
 need_cmd grep
-need_cmd sed
 need_cmd find
 
 echo "System detected: Linux"
@@ -56,12 +55,16 @@ echo "System architecture detected: ${SYSTEM_ARCH}"
 echo "Matched ddns-go package architecture: linux_${ASSET_ARCH}"
 echo
 
-echo "Fetching latest ddns-go release metadata..."
-RELEASE_JSON="$(curl -fsSL --retry 3 --connect-timeout 15 "${API_URL}")"
-VERSION="$(printf '%s\n' "${RELEASE_JSON}" | sed -nE 's/.*"tag_name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' | sed -n '1p')"
+echo "Fetching latest ddns-go release version..."
+if ! EFFECTIVE_URL="$(curl -fsSL --retry 3 --connect-timeout 15 -o /dev/null -w '%{url_effective}' "${LATEST_URL}")"; then
+  echo "Unable to access ddns-go latest release page: ${LATEST_URL}" >&2
+  exit 1
+fi
 
-if [ -z "${VERSION}" ]; then
-  echo "Unable to resolve latest ddns-go version from GitHub." >&2
+VERSION="${EFFECTIVE_URL##*/}"
+
+if [ -z "${VERSION}" ] || [ "${VERSION}" = "latest" ] || ! printf '%s' "${VERSION}" | grep -Eq '^v?[0-9]'; then
+  echo "Unable to resolve latest ddns-go version from: ${EFFECTIVE_URL}" >&2
   exit 1
 fi
 
