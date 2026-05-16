@@ -58,18 +58,24 @@ echo
 
 echo "Fetching latest ddns-go release metadata..."
 RELEASE_JSON="$(curl -fsSL --retry 3 --connect-timeout 15 "${API_URL}")"
-VERSION="$(printf '%s\n' "${RELEASE_JSON}" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
-ASSET_URL="$(printf '%s\n' "${RELEASE_JSON}" | grep -m1 '"browser_download_url".*linux_'"${ASSET_ARCH}"'.*\.tar\.gz' | sed -E 's/.*"browser_download_url"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/')"
+VERSION="$(printf '%s\n' "${RELEASE_JSON}" | sed -nE 's/.*"tag_name"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' | sed -n '1p')"
 
-if [ -z "${VERSION}" ] || [ -z "${ASSET_URL}" ]; then
-  echo "Unable to resolve latest ddns-go release asset for linux_${ASSET_ARCH}." >&2
+if [ -z "${VERSION}" ]; then
+  echo "Unable to resolve latest ddns-go version from GitHub." >&2
   exit 1
 fi
 
-ASSET_NAME="${ASSET_URL##*/}"
+VERSION_NUMBER="${VERSION#v}"
+ASSET_NAME="ddns-go_${VERSION_NUMBER}_linux_${ASSET_ARCH}.tar.gz"
+ASSET_URL="https://github.com/${DDNS_GO_REPO}/releases/download/${VERSION}/${ASSET_NAME}"
 echo "Latest version: ${VERSION}"
 echo "Selected package: ${ASSET_NAME}"
 echo
+
+if ! curl -fIL --retry 3 --connect-timeout 15 -o /dev/null "${ASSET_URL}"; then
+  echo "Unable to access ddns-go package: ${ASSET_URL}" >&2
+  exit 1
+fi
 
 read -r -p "Enter ddns-go web port, for example 50897: " WEB_PORT
 WEB_PORT="${WEB_PORT#:}"
